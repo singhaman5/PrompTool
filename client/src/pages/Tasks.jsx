@@ -1,15 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import { CheckCircle2, Circle, Clock, AlertCircle, X, Plus } from 'lucide-react';
+import { CheckCircle2, Circle, X, Plus } from 'lucide-react';
 import { useTask } from '../context/TaskContext';
+import axios from 'axios';
 
 const Tasks = () => {
-  const { tasks, addTask, removeTask, loading, fetchTasks } = useTask();
+  const { tasks, addTask, removeTask, updateTask, fetchTasks } = useTask();
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({ title: '', project: '', priority: 'Medium', dueDate: '', description: '' });
+  const [projects, setProjects] = useState([]);
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+    const loadProjects = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        const res = await axios.get('http://localhost:3001/api/projects', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data.success) {
+          setProjects(res.data.data);
+        }
+      } catch (err) {
+        console.error('Error loading projects:', err);
+      }
+    };
+    loadProjects();
+  }, [fetchTasks]);
 
   const getPriorityStyle = (p) => {
     switch(p) {
@@ -23,10 +40,17 @@ const Tasks = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (formData.title.trim()) {
-      addTask(formData);
+      addTask({
+        ...formData,
+        project: formData.project || null // Send null if empty
+      });
       setFormData({ title: '', project: '', priority: 'Medium', dueDate: '', description: '' });
       setShowForm(false);
     }
+  };
+
+  const toggleStatus = (task) => {
+    updateTask(task._id, { status: task.status === 'Done' ? 'Todo' : 'Done' });
   };
 
   return (
@@ -46,7 +70,12 @@ const Tasks = () => {
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
             <input type="text" placeholder="Task title" required value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="col-span-2 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" />
             <input type="text" placeholder="Description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="col-span-2 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" />
-            <input type="text" placeholder="Project name" value={formData.project} onChange={(e) => setFormData({...formData, project: e.target.value})} className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" />
+            <select value={formData.project} onChange={(e) => setFormData({...formData, project: e.target.value})} className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
+              <option value="">No Project</option>
+              {projects.map(p => (
+                <option key={p._id} value={p._id}>{p.title}</option>
+              ))}
+            </select>
             <select value={formData.priority} onChange={(e) => setFormData({...formData, priority: e.target.value})} className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
               <option>Low</option>
               <option>Medium</option>
@@ -78,14 +107,19 @@ const Tasks = () => {
               
               {/* Task Name & Project */}
               <div className="col-span-6 flex items-start gap-3">
-                <button className="text-gray-300 hover:text-emerald-500 mt-0.5 transition-colors">
+                <button 
+                  onClick={() => toggleStatus(task)} 
+                  className="text-gray-300 hover:text-emerald-500 mt-0.5 transition-colors"
+                >
                    {task.status === 'Done' ? <CheckCircle2 className="text-emerald-500" size={20} /> : <Circle size={20} />}
                 </button>
                 <div>
                   <h4 className={`text-sm font-semibold text-gray-900 ${task.status === 'Done' ? 'line-through text-gray-400' : ''}`}>
                     {task.title}
                   </h4>
-                  <span className="text-xs text-gray-500">{task.project}</span>
+                  <span className="text-xs text-gray-500">
+                    {task.project?.title || ''}
+                  </span>
                 </div>
               </div>
 

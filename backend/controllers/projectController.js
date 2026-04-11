@@ -6,6 +6,7 @@
 // All routes here are PROTECTED (user must be logged in).
 
 const Project = require('../models/Project');
+const Task = require('../models/Task');
 
 // ========== 1. GET ALL PROJECTS ==========
 // GET /api/projects
@@ -18,7 +19,12 @@ const getProjects = async (req, res, next) => {
         const projects = await Project.find({ createdBy: req.user._id })
             .sort({ createdAt: -1 });
 
-        res.json({ success: true, data: projects });
+        const projectsWithCount = await Promise.all(projects.map(async (p) => {
+            const count = await Task.countDocuments({ project: p._id });
+            return { ...p, taskCount: count };
+        }));
+
+        res.json({ success: true, data: projectsWithCount });
     } catch (error) {
         next(error);
     }
@@ -52,12 +58,13 @@ const getProject = async (req, res, next) => {
 
 const createProject = async (req, res, next) => {
     try {
-        const { title, description, color } = req.body;
+        const { title, description, color, assignee } = req.body;
 
         const project = await Project.create({
             title,
             description,
             color,
+            assignee: assignee || 'Assign yourself',
             createdBy: req.user._id    // Link project to logged-in user
         });
 

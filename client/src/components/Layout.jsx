@@ -13,16 +13,16 @@ const Layout = () => {
     return 'Workspace';
   };
   return (
-    <div className="flex min-h-screen dotted-bg font-sans">
+    <div className="flex h-screen overflow-hidden dotted-bg font-sans">
 
       <Sidebar />
 
       {/* 2. Main Content Wrapper */}
-      <div className="flex-1 ml-64 flex flex-col relative">
+      <div className="flex-1 ml-64 flex flex-col relative h-full">
 
         {/* --- NAVBAR START --- */}
-        {/* We use 'sticky' to keep it at the top while scrolling */}
-        <header className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-3 flex items-center justify-between transition-all">
+        {/* We use 'shrink-0' to keep navbar height fixed */}
+        <header className="shrink-0 z-30 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-3 flex items-center justify-between transition-all">
 
           {/* Left: Breadcrumb / Title */}
           <div className="flex items-center gap-2">
