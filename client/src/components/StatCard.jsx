@@ -25,18 +25,18 @@ const StatCard = ({ icon, label, value, color }) => {
   const currentStyle = styles[color] || styles.blue;
 
   return (
-    <div className="bg-gradient-to-br from-white to-blue-100 p-6 rounded-2xl border border-gray-100 flex items-center gap-5 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+    <div className="bg-gradient-to-br from-white to-blue-100 p-4 rounded-2xl border border-gray-100 flex items-center gap-4 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
       
       {/* THE GRADIENT IS APPLIED HERE 👇 
          We use `bg-gradient-to-br` (Bottom Right) for a subtle 3D effect 
       */}
-      <div className={`p-4 rounded-xl shadow-sm ${currentStyle.bg} ${currentStyle.text}`}>
+      <div className={`p-3 rounded-xl shadow-sm ${currentStyle.bg} ${currentStyle.text}`}>
         {icon}
       </div>
       
       <div>
-        <p className="text-gray-500 text-sm font-medium mb-1">{label}</p>
-        <h3 className="text-3xl font-bold text-gray-800">{value}</h3>
+        <p className="text-gray-500 text-xs font-medium mb-0.5">{label}</p>
+        <h3 className="text-2xl font-bold text-gray-800">{value}</h3>
       </div>
     </div>
   );

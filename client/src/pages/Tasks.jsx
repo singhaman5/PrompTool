@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Circle, Clock, AlertCircle, X, Plus } from 'lucide-react';
 import { useTask } from '../context/TaskContext';
 
 const Tasks = () => {
-  const { tasks, addTask, removeTask } = useTask();
+  const { tasks, addTask, removeTask, loading, fetchTasks } = useTask();
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ title: '', project: '', priority: 'Medium', due: '' });
+  const [formData, setFormData] = useState({ title: '', project: '', priority: 'Medium', dueDate: '', description: '' });
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   const getPriorityStyle = (p) => {
     switch(p) {
@@ -20,7 +24,7 @@ const Tasks = () => {
     e.preventDefault();
     if (formData.title.trim()) {
       addTask(formData);
-      setFormData({ title: '', project: '', priority: 'Medium', due: '' });
+      setFormData({ title: '', project: '', priority: 'Medium', dueDate: '', description: '' });
       setShowForm(false);
     }
   };
@@ -41,6 +45,7 @@ const Tasks = () => {
         <div className="bg-white rounded-2xl border border-orange-200 shadow-sm p-6 mb-6">
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
             <input type="text" placeholder="Task title" required value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="col-span-2 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" />
+            <input type="text" placeholder="Description" value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="col-span-2 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" />
             <input type="text" placeholder="Project name" value={formData.project} onChange={(e) => setFormData({...formData, project: e.target.value})} className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" />
             <select value={formData.priority} onChange={(e) => setFormData({...formData, priority: e.target.value})} className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none">
               <option>Low</option>
@@ -48,7 +53,7 @@ const Tasks = () => {
               <option>High</option>
               <option>Urgent</option>
             </select>
-            <input type="date" value={formData.due} onChange={(e) => setFormData({...formData, due: e.target.value})} className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" />
+            <input type="date" value={formData.dueDate} onChange={(e) => setFormData({...formData, dueDate: e.target.value})} className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" />
             <div className="col-span-2 flex gap-2">
               <button type="submit" className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg transition-colors">Add Task</button>
               <button type="button" onClick={() => setShowForm(false)} className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 rounded-lg transition-colors">Cancel</button>
@@ -69,7 +74,7 @@ const Tasks = () => {
         {/* List Items */}
         <div className="divide-y divide-gray-50">
           {tasks.map((task) => (
-            <div key={task.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors group">
+            <div key={task._id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-gray-50 transition-colors group">
               
               {/* Task Name & Project */}
               <div className="col-span-6 flex items-start gap-3">
@@ -100,7 +105,7 @@ const Tasks = () => {
 
               {/* Delete Button */}
               <div className="col-span-2 flex justify-end">
-                <button onClick={() => removeTask(task.id)} className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100">
+                <button onClick={() => removeTask(task._id)} className="p-1 text-red-500 hover:bg-red-50 rounded transition-colors opacity-0 group-hover:opacity-100">
                   <X size={18} />
                 </button>
               </div>

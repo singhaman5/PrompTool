@@ -1,26 +1,77 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
+import axios from 'axios';
 
+const API_URL = 'http://localhost:3001/api';
 const TaskContext = createContext();
 
-export const TaskProvider = ({ children }) => {
-  const [tasks, setTasks] = useState([
-    { id: 1, title: "Design homepage hero section", project: "Website Redesign", status: "In Progress", priority: "High", due: "Today" },
-    { id: 2, title: "Fix navigation bug on mobile", project: "Mobile App", status: "Todo", priority: "Urgent", due: "Tomorrow" },
-    { id: 3, title: "API Integration docs", project: "API Integration", status: "Done", priority: "Medium", due: "Feb 24" },
-    { id: 4, title: "Update color palette", project: "Design System", status: "Todo", priority: "Low", due: "Feb 28" },
-    { id: 5, title: "Conduct user testing", project: "Mobile App", status: "In Progress", priority: "High", due: "Mar 02" },
-  ]);
+const getAuthHeader = () => {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
 
-  const addTask = (newTask) => {
-    setTasks([...tasks, { ...newTask, id: Date.now() }]);
+export const TaskProvider = ({ children }) => {
+  const [tasks, setTasks] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch tasks from backend
+  const fetchTasks = useCallback(async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_URL}/tasks`, { headers: getAuthHeader() });
+      if (res.data.success) {
+        setTasks(res.data.data);
+      }
+    } catch (err) {
+      console.error('Error fetching tasks:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
+
+  const addTask = async (taskData) => {
+    try {
+      const res = await axios.post(`${API_URL}/tasks`, taskData, { headers: getAuthHeader() });
+      if (res.data.success) {
+        setTasks(prev => [res.data.data, ...prev]);
+      }
+    } catch (err) {
+      console.error('Error adding task:', err);
+    }
   };
 
-  const removeTask = (id) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const removeTask = async (id) => {
+    try {
+      const res = await axios.delete(`${API_URL}/tasks/${id}`, { headers: getAuthHeader() });
+      if (res.data.success) {
+        setTasks(prev => prev.filter(task => task._id !== id));
+      }
+    } catch (err) {
+      console.error('Error deleting task:', err);
+    }
+  };
+
+  const updateTask = async (id, updatedFields) => {
+    try {
+      const res = await axios.put(`${API_URL}/tasks/${id}`, updatedFields, { headers: getAuthHeader() });
+      if (res.data.success) {
+        setTasks(prev => prev.map(task => task._id === id ? res.data.data : task));
+      }
+    } catch (err) {
+      console.error('Error updating task:', err);
+    }
   };
 
   return (
-    <TaskContext.Provider value={{ tasks, addTask, removeTask }}>
+    <TaskContext.Provider value={{ tasks, addTask, removeTask, updateTask, loading, fetchTasks }}>
       {children}
     </TaskContext.Provider>
   );

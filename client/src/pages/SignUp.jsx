@@ -1,26 +1,31 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios'
+import { useTask } from '../context/TaskContext';
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const { fetchTasks } = useTask();
   const[name, setName] = useState('');
   const[email, setEmail] = useState('');
   const[password, setPassword] = useState('');
 
-  console.log({ name, email, password });
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:3001/users',{name,email,password})
-    .then(result=> {
+    axios.post('http://localhost:3001/api/auth/signup',{name,email,password})
+    .then(async (result) => {
       console.log(result);
-      if(result.data) {
-        alert("Account created successfully!");
-        navigate('/dashboard')
+      if(result.data.success) {
+        localStorage.setItem("token", result.data.token);
+        localStorage.setItem("user", JSON.stringify(result.data.user));
+        await fetchTasks();
+        navigate('/app/dashboard');
       }
-      
     })
-    .catch(err => console.log(err))
+    .catch(err => {
+      console.log(err);
+      alert(err.response?.data?.message || err.response?.data?.error || "Signup failed");
+    })
   };
 
   return (

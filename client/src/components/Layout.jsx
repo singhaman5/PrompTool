@@ -1,41 +1,49 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './sidebar';
 import { Search, Bell, ChevronDown, HelpCircle } from 'lucide-react';
 
 const Layout = () => {
+  const location = useLocation();
+  const getPageTitle = () => {
+    if (location.pathname === '/app') return 'Dashboard';
+    if (location.pathname === '/app/board') return 'Kanban Board';
+    if (location.pathname === '/app/projects') return 'Projects';
+    if (location.pathname === '/app/team') return 'Team';
+    return 'Workspace';
+  };
   return (
     <div className="flex min-h-screen dotted-bg font-sans">
-      
+
       <Sidebar />
 
       {/* 2. Main Content Wrapper */}
       <div className="flex-1 ml-64 flex flex-col relative">
-        
+
         {/* --- NAVBAR START --- */}
         {/* We use 'sticky' to keep it at the top while scrolling */}
         <header className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 px-6 py-3 flex items-center justify-between transition-all">
-          
+
           {/* Left: Breadcrumb / Title */}
           <div className="flex items-center gap-2">
             <h1 className="text-lg font-semibold text-gray-800 tracking-tight" style={{ fontFamily: "'Oswald', sans-serif" }}>Area 51</h1>
             <span className="text-gray-300 text-xl font-light">/</span>
-            <span className="text-sm font-normal text-gray-500">Workspace</span>
+            <span className="text-sm font-normal text-gray-500">{getPageTitle()}</span>
           </div>
 
           {/* Right: Actions Area */}
           <div className="flex items-center gap-4">
-            
+
             {/* Search Bar (Pill Shape) */}
             <div className="relative hidden md:block group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" size={16} />
-              <input 
-                type="text" 
-                placeholder="Search anything..." 
+              <input
+                type="text"
+                placeholder="Search anything..."
                 className="bg-gray-100 hover:bg-white focus:bg-white pl-9 pr-4 py-2 rounded-full text-sm border border-transparent focus:border-orange-200 focus:ring-4 focus:ring-orange-500/10 transition-all w-64 outline-none placeholder:text-gray-400"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                 <span className="text-[10px] text-gray-400 bg-white border border-gray-200 px-1.5 py-0.5 rounded shadow-sm">⌘K</span>
+                <span className="text-[10px] text-gray-400 bg-white border border-gray-200 px-1.5 py-0.5 rounded shadow-sm">⌘K</span>
               </div>
             </div>
 
@@ -47,7 +55,7 @@ const Layout = () => {
               <button className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors">
                 <HelpCircle size={20} />
               </button>
-              
+
               <button className="relative text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-2 rounded-full transition-colors">
                 <Bell size={20} />
                 <span className="absolute top-2 right-2.5 w-2 h-2 bg-orange-500 rounded-full border-2 border-white"></span>
@@ -72,7 +80,7 @@ const Layout = () => {
 
         {/* Dynamic Page Content */}
         {/* Added overflow-y-auto to handle scrolling independently if needed */}
-        <main className="flex-1 p-8 overflow-y-auto">
+        <main className="flex-1 p-6 overflow-y-auto">
           <Outlet />
         </main>
 

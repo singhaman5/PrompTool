@@ -1,55 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Plus, Search, Mail, MessageSquare, MoreVertical, Phone, Filter } from 'lucide-react';
 
 const Team = () => {
-  // Dummy Data
-  const members = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      role: "Product Designer",
-      status: "Online",
-      email: "sarah@planly.com",
-      tags: ["UI/UX", "Figma", "Research"],
-      color: "bg-orange-100 text-orange-600"
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      role: "Frontend Developer",
-      status: "Busy",
-      email: "michael@planly.com",
-      tags: ["React", "Tailwind", "TypeScript"],
-      color: "bg-blue-100 text-blue-600"
-    },
-    {
-      id: 3,
-      name: "Jessica Davis",
-      role: "Backend Lead",
-      status: "Offline",
-      email: "jess@planly.com",
-      tags: ["Node.js", "Python", "AWS"],
-      color: "bg-purple-100 text-purple-600"
-    },
-    {
-      id: 4,
-      name: "David Kim",
-      role: "DevOps Engineer",
-      status: "Online",
-      email: "david@planly.com",
-      tags: ["Docker", "Kubernetes", "CI/CD"],
-      color: "bg-emerald-100 text-emerald-600"
-    },
-    {
-      id: 5,
-      name: "Emily Wilson",
-      role: "Project Manager",
-      status: "In Meeting",
-      email: "emily@planly.com",
-      tags: ["Agile", "Scrum", "Jira"],
-      color: "bg-pink-100 text-pink-600"
-    }
-  ];
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        const token = localStorage.getItem('token');
+
+        const res = await axios.get('http://localhost:3001/api/auth/users', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (res.data.success) {
+          setMembers(res.data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching team:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTeam();
+  }, []);
+
+  if (loading) {
+    return <div className="p-8 text-gray-500">Loading Team</div>
+  }
 
   // Helper for Status Dot Colors
   const getStatusColor = (status) => {
@@ -68,35 +51,35 @@ const Team = () => {
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Team Members</h1>
           <p className="text-gray-500 mt-1">Manage your team, permissions, and roles.</p>
         </div>
-        
-        <div className="flex flex-wrap gap-3">
-            {/* Search Bar */}
-            <div className="relative group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" size={18} />
-                <input 
-                  type="text" 
-                  placeholder="Search members..." 
-                  className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-500 w-64 transition-all"
-                />
-            </div>
 
-            <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-colors">
-                <Filter size={18} /> Filter
-            </button>
-            
-            <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200 hover:shadow-xl hover:-translate-y-0.5 transform duration-200">
-                <Plus size={18} /> Invite Member
-            </button>
+        <div className="flex flex-wrap gap-3">
+          {/* Search Bar */}
+          <div className="relative group">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-colors" size={18} />
+            <input
+              type="text"
+              placeholder="Search members..."
+              className="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-100 focus:border-orange-500 w-64 transition-all"
+            />
+          </div>
+
+          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-colors">
+            <Filter size={18} /> Filter
+          </button>
+
+          <button className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors shadow-lg shadow-gray-200 hover:shadow-xl hover:-translate-y-0.5 transform duration-200">
+            <Plus size={18} /> Invite Member
+          </button>
         </div>
       </div>
 
       {/* 2. Team Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
+
         {/* Mapping Members */}
         {members.map((member) => (
-          <div key={member.id} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group relative">
-            
+          <div key={member._id} className="bg-white rounded-2xl border border-gray-100 p-6 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 group relative">
+
             {/* Top Right Menu */}
             <button className="absolute top-4 right-4 text-gray-300 hover:text-gray-600 p-1 hover:bg-gray-50 rounded-lg transition-colors">
               <MoreVertical size={20} />
@@ -104,7 +87,7 @@ const Team = () => {
 
             {/* Profile Section */}
             <div className="flex flex-col items-center text-center">
-              
+
               {/* Avatar with Status Dot */}
               <div className="relative mb-4">
                 <div className={`w-24 h-24 rounded-full ${member.color} flex items-center justify-center text-3xl font-bold shadow-inner`}>
@@ -112,14 +95,14 @@ const Team = () => {
                 </div>
                 <div className={`absolute bottom-1 right-1 w-5 h-5 border-[3px] border-white rounded-full ${getStatusColor(member.status)}`}></div>
               </div>
-              
+
               {/* Name & Role */}
               <h3 className="text-xl font-bold text-gray-900 mb-1">{member.name}</h3>
               <p className="text-sm font-medium text-gray-500 mb-4">{member.role}</p>
-              
+
               {/* Skills Tags */}
               <div className="flex flex-wrap justify-center gap-2 mb-6 min-h-[32px]">
-                {member.tags.map((tag, index) => (
+                {member.tags?.map((tag, index) => (
                   <span key={index} className="px-2.5 py-1 bg-gray-50 text-gray-600 text-xs font-semibold rounded-md border border-gray-100 hover:bg-gray-100 hover:border-gray-200 transition-colors cursor-default">
                     {tag}
                   </span>
