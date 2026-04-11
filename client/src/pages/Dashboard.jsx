@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import StatCard from '../components/StatCard';
-import { ListTodo, Timer, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ListTodo, Timer, CheckCircle2, AlertCircle, Circle, ArrowRight } from 'lucide-react';
 import { useTask } from '../context/TaskContext';
 import axios from 'axios';
-import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const Dashboard = () => {
   const { tasks, fetchTasks, updateTask } = useTask();
@@ -34,7 +34,6 @@ const Dashboard = () => {
   const completedCount = tasks.filter(t => t.status === 'Done').length;
   const highPriorityCount = tasks.filter(t => t.priority === 'High' || t.priority === 'Urgent').length;
 
-  // Mock data for CV-Ready chart
   const activityData = [
     { name: 'Mon', completed: 4 },
     { name: 'Tue', completed: 7 },
@@ -49,133 +48,132 @@ const Dashboard = () => {
     <div className="space-y-6 pt-2">
       {/* 1. Stats Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-        <StatCard icon={<ListTodo size={20} />} label="Total Tasks" value={tasks.length} color="blue" />
-        <StatCard icon={<Timer size={20} />} label="In Progress" value={inProgressCount} color="orange" />
-        <StatCard icon={<CheckCircle2 size={20} />} label="Completed" value={completedCount} color="green" />
-        <StatCard icon={<AlertCircle size={20} />} label="High Priority" value={highPriorityCount} color="red" />
+        <StatCard icon={<ListTodo size={18} />} label="Total Tasks" value={tasks.length} color="blue" />
+        <StatCard icon={<Timer size={18} />} label="In Progress" value={inProgressCount} color="indigo" />
+        <StatCard icon={<CheckCircle2 size={18} />} label="Completed" value={completedCount} color="emerald" />
+        <StatCard icon={<AlertCircle size={18} />} label="High Priority" value={highPriorityCount} color="rose" />
       </div>
 
       {/* 2. Content Split */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Left: Recent Tasks & Chart (Takes 2 columns) */}
-        <div className="col-span-2 space-y-6">
+        {/* Left: Recent Tasks & Chart */}
+        <div className="col-span-1 lg:col-span-2 space-y-6">
           
-          {/* C. Weekly Activity Chart */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Weekly Activity</h2>
-            <div className="h-56 w-full">
+          {/* Activity Chart */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-lg font-bold text-gray-900">Weekly Activity</h2>
+              <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">Last 7 Days</span>
+            </div>
+            <div className="h-48 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={activityData}>
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 12}} dy={10} />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9CA3AF', fontSize: 10, fontWeight: 600}} dy={10} />
                   <Tooltip 
-                    cursor={{fill: '#F3F4F6'}}
-                    contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'}}
+                    cursor={{fill: '#F8FAFC'}}
+                    contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'}}
                   />
-                  <Bar dataKey="completed" fill="#f97316" radius={[4, 4, 0, 0]} barSize={32} />
+                  <Bar dataKey="completed" radius={[4, 4, 0, 0]} barSize={24}>
+                     {activityData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={index === 5 ? '#3B82F6' : '#E2E8F0'} />
+                     ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          {/* B. Recent Tasks with "Mark as Done" */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-            <h2 className="text-lg font-bold text-gray-800 mb-4">Recent Tasks</h2>
-            <div className="space-y-3">
-              {tasks.filter(t => t.status !== 'Done').slice(0, 5).map(task => (
-                <TaskItem
-                  key={task._id}
-                  task={task}
-                  onToggleDone={() => updateTask(task._id, { status: 'Done' })}
-                />
+          {/* Recent Tasks */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-gray-50 flex justify-between items-center">
+              <h2 className="text-lg font-bold text-gray-900">Ongoing Tasks</h2>
+              <Link to="/app/tasks" className="text-xs font-bold text-blue-600 hover:underline flex items-center gap-1">
+                View All <ArrowRight size={12} />
+              </Link>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {tasks.filter(t => t.status !== 'Done').slice(0, 4).map(task => (
+                <div key={task._id} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors group">
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={() => updateTask(task._id, { status: 'Done' })}
+                      className="text-gray-300 hover:text-blue-500 transition-colors"
+                    >
+                      <Circle size={18} />
+                    </button>
+                    <div>
+                      <h4 className="font-bold text-gray-900 text-sm leading-tight">{task.title}</h4>
+                      {task.project && <p className="text-[10px] font-bold text-blue-500 uppercase tracking-tight mt-0.5">{task.project.title}</p>}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                     <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${
+                       task.priority === 'Urgent' ? 'bg-red-50 text-red-600' :
+                       task.priority === 'High' ? 'bg-orange-50 text-orange-600' :
+                       'bg-blue-50 text-blue-600'
+                     }`}>
+                       {task.priority}
+                     </span>
+                  </div>
+                </div>
               ))}
-              {tasks.filter(t => t.status !== 'Done').length === 0 && <p className="text-gray-500 text-sm">No active tasks right now!</p>}
+              {tasks.filter(t => t.status !== 'Done').length === 0 && (
+                <div className="p-12 text-center text-gray-400 text-sm font-medium">✨ All tasks completed!</div>
+              )}
             </div>
           </div>
-
         </div>
 
-        {/* Right: Projects (Takes 1 column) */}
-        <div className="col-span-1 space-y-5">
-          <h2 className="text-lg font-bold text-gray-800">Projects</h2>
+        {/* Right: Projects */}
+        <div className="col-span-1 space-y-6">
+          <div className="flex justify-between items-center px-1">
+            <h2 className="text-lg font-bold text-gray-900">Active Projects</h2>
+            <Link to="/app/projects" className="text-xs font-bold text-gray-400 hover:text-gray-600 uppercase tracking-widest">More</Link>
+          </div>
 
-          {projects.length > 0 ? projects.slice(0, 4).map((proj, idx) => {
-            const bgColors = ["bg-orange-50", "bg-blue-50", "bg-green-50", "bg-purple-50"];
-            const pColors = ["bg-orange-500", "bg-blue-500", "bg-green-500", "bg-purple-500"];
-            const bColor = bgColors[idx % bgColors.length];
-            const pColor = pColors[idx % pColors.length];
-
-            // A. Progress Bar Math (Mock calculation based on string hash for visual variety)
-            const randomProgress = [35, 68, 85, 20][idx % 4];
-
-            return (
-              <div key={proj._id} className={`${bColor} border border-transparent hover:border-gray-200 transition-colors p-5 rounded-2xl shadow-sm`}>
-                <div className="flex items-center gap-2 mb-2">
-                  <div className={`w-2 h-2 rounded-full ${pColor}`}></div>
-                  <h3 className="font-bold text-gray-800">{proj.title}</h3>
+          <div className="space-y-4">
+            {projects.length > 0 ? projects.slice(0, 3).map((proj, idx) => (
+              <div key={proj._id} className="bg-white border border-gray-100 p-5 rounded-2xl shadow-sm hover:border-blue-200 transition-all group">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{proj.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-1">{proj.description}</p>
+                  </div>
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm ${
+                    proj.color === 'green' ? 'bg-emerald-100 text-emerald-600' :
+                    proj.color === 'orange' ? 'bg-orange-100 text-orange-600' :
+                    'bg-blue-100 text-blue-600'
+                  }`}>
+                    {proj.title.charAt(0)}
+                  </div>
                 </div>
-                <p className="text-gray-500 text-sm mb-4 line-clamp-1">{proj.description}</p>
                 
-                {/* A. Progress Bar UI */}
-                <div>
-                   <div className="flex justify-between text-xs font-bold text-gray-500 mb-2">
-                     <span>Progress</span>
-                     <span>{randomProgress}%</span>
+                {/* Progress Mini Bar */}
+                <div className="pt-2">
+                   <div className="flex justify-between text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-tighter">
+                     <span>Deployment</span>
+                     <span className="text-gray-900">75%</span>
                    </div>
-                   <div className="w-full bg-white/60 h-2 rounded-full overflow-hidden">
-                      <div className={`h-full ${pColor} rounded-full`} style={{ width: `${randomProgress}%` }}></div>
+                   <div className="w-full bg-gray-50 h-1.5 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${
+                        proj.color === 'green' ? 'bg-emerald-500' :
+                        proj.color === 'orange' ? 'bg-orange-500' :
+                        'bg-blue-500'
+                      }`} style={{ width: `75%` }}></div>
                    </div>
                 </div>
               </div>
-            );
-          }) : (
-            <p className="text-gray-500 text-sm">No projects active.</p>
-          )}
-
+            )) : (
+              <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center">
+                <p className="text-gray-400 text-sm font-medium">No projects yet</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 };
-
-// Helper for Task Row
-const TaskItem = ({ task, onToggleDone }) => {
-  const getPriorityColors = (p) => {
-    switch (p?.toLowerCase()) {
-      case 'urgent':
-      case 'high': return "bg-red-100 text-red-600";
-      case 'medium': return "bg-orange-100 text-orange-600";
-      case 'low': return "bg-green-100 text-green-600";
-      default: return "bg-gray-100 text-gray-600";
-    }
-  };
-
-  return (
-    <div className="flex items-center justify-between p-3 bg-white border border-gray-100 hover:shadow-md hover:border-orange-200 rounded-xl transition-all group">
-      <div className="flex items-center gap-4">
-        {/* Quick Done Checkbox */}
-        <button 
-          onClick={onToggleDone}
-          className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center group-hover:border-orange-500 transition-colors"
-          title="Mark as Done"
-        >
-           <span className="w-2.5 h-2.5 bg-orange-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></span>
-        </button>
-        <div>
-          <h4 className="font-semibold text-gray-800 text-sm">{task.title}</h4>
-          <p className="text-xs text-gray-500">{task.project ? task.project.title : 'No Project'}</p>
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        <span className={`px-3 py-1 rounded-full text-[10px] uppercase font-extrabold tracking-wider ${getPriorityColors(task.priority)}`}>
-          {task.priority || 'None'}
-        </span>
-        <span className="text-xs text-gray-400 font-medium">
-            {new Date(task.createdAt).toLocaleDateString()}
-        </span>
-      </div>
-    </div>
-  );
-}
 
 export default Dashboard;

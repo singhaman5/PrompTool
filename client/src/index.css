@@ -111,25 +111,6 @@ button {
   border-radius: 20px;
 }
 
-/* Board-only orange theme */
-.board-theme {
-  --board-orange-50: #fff7ed;
-  --board-orange-100: #ffedd5;
-  --board-orange-200: #fed7aa;
-  --board-orange-500: #f97316;
-
-  background: radial-gradient(900px 500px at 10% -10%, var(--board-orange-100), transparent),
-    radial-gradient(700px 450px at 90% 0%, #fff2e0, transparent),
-    var(--board-orange-50);
-  border: 1px solid var(--board-orange-200);
-  border-radius: 24px;
-  padding: 24px;
-}
-
-.board-theme .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: var(--board-orange-200);
-}
-
 .dotted-bg {
   background-color: #ffffff;
   

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { MoreHorizontal, Plus, Calendar } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { MoreHorizontal, Plus, Calendar, Tag } from 'lucide-react';
 import { useTask } from '../context/TaskContext';
 
 const Board = () => {
@@ -12,11 +12,10 @@ const Board = () => {
   }, [fetchTasks]);
 
   // 2. THE COLUMNS CONFIGURATION
-  // Matches backend Database enum: 'Todo', 'In Progress', 'Done'
   const columns = [
-    { id: 'Todo', title: 'To Do', color: 'bg-gray-100', dot: 'bg-gray-500', iconColor: 'text-gray-500' },
-    { id: 'In Progress', title: 'In Progress', color: 'bg-blue-50', dot: 'bg-blue-500', iconColor: 'text-blue-500' },
-    { id: 'Done', title: 'Done', color: 'bg-green-50', dot: 'bg-green-500', iconColor: 'text-green-500' },
+    { id: 'Todo', title: 'To Do', color: 'bg-gray-50/50', border: 'border-gray-200/50', dot: 'bg-gray-400' },
+    { id: 'In Progress', title: 'In Progress', color: 'bg-blue-50/30', border: 'border-blue-100', dot: 'bg-blue-500' },
+    { id: 'Done', title: 'Done', color: 'bg-emerald-50/30', border: 'border-emerald-100', dot: 'bg-emerald-500' },
   ];
 
   const handleDragStart = (e, taskId) => {
@@ -24,7 +23,7 @@ const Board = () => {
   };
 
   const handleDragOver = (e) => {
-    e.preventDefault(); // Necessary to allow dropping
+    e.preventDefault();
   };
 
   const handleDrop = (e, status) => {
@@ -36,11 +35,16 @@ const Board = () => {
   };
 
   return (
-    <div className="board-theme h-full flex flex-col pt-2">
+    <div className="h-full flex flex-col p-4 space-y-6">
+      <div className="flex justify-between items-center shrink-0">
+        <div>
+           <h1 className="text-3xl font-bold text-gray-900">Board</h1>
+           <p className="text-gray-500 mt-1">Visualize your workflow and drag tasks across stages.</p>
+        </div>
+      </div>
 
-      {/* Kanban Board Grid */}
-      <div className="flex-1 overflow-x-auto">
-        <div className="flex gap-6 min-w-[750px] h-full">
+      <div className="flex-1 overflow-x-auto custom-scrollbar pb-4">
+        <div className="flex gap-6 h-full min-w-[900px]">
 
           {columns.map((col) => {
             const colTasks = tasks.filter(t => t.status === col.id);
@@ -48,49 +52,45 @@ const Board = () => {
             return (
               <div
                 key={col.id}
-                className={`flex-1 rounded-2xl p-4 ${col.color} flex flex-col gap-4 h-full`}
+                className={`flex-1 flex flex-col min-w-[300px] h-full`}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, col.id)}
               >
-
                 {/* Column Header */}
-                <div className="flex justify-between items-center mb-2">
+                <div className="flex justify-between items-center mb-4 px-2">
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${col.dot}`}></div>
-                    <h3 className="font-bold text-gray-700">{col.title}</h3>
-                    <span className="text-gray-400 text-sm font-medium">
+                    <h3 className="font-bold text-gray-800 text-sm">{col.title}</h3>
+                    <span className="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full">
                       {colTasks.length}
                     </span>
                   </div>
                   <button
                     onClick={() => setAddingToCol(col.id)}
-                    className={`p-1 hover:bg-white rounded-md transition-colors ${col.iconColor}`}>
-                    <Plus size={18} />
+                    className="p-1 hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors">
+                    <Plus size={16} />
                   </button>
                 </div>
 
                 {/* Task Cards List */}
-                <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pb-4">
-
-                  {/* --- NEW INLINE INPUT BOX --- */}
+                <div className={`flex-1 overflow-y-auto space-y-3 custom-scrollbar p-2 rounded-2xl border ${col.border} ${col.color}`}>
                   {addingToCol === col.id && (
-                    <div className="bg-white p-3 rounded-xl shadow-sm border-2 border-orange-400">
+                    <div className="bg-white p-3 rounded-xl shadow-sm border-2 border-blue-500 animate-in fade-in slide-in-from-top-2">
                       <input
                         autoFocus
                         type="text"
-                        placeholder="Type task... (Hit Enter)"
-                        className="w-full text-sm outline-none text-gray-800 placeholder:text-gray-400"
+                        placeholder="Task title..."
+                        className="w-full text-sm outline-none text-gray-800 placeholder:text-gray-400 font-medium"
                         value={newTaskTitle}
                         onChange={(e) => setNewTaskTitle(e.target.value)}
                         onBlur={() => {
-                          setAddingToCol(null);
-                          setNewTaskTitle("");
+                          if (!newTaskTitle.trim()) setAddingToCol(null);
                         }}
                         onKeyDown={async (e) => {
                           if (e.key === 'Enter' && newTaskTitle.trim()) {
                             await addTask({ title: newTaskTitle, status: col.id, priority: 'Medium' });
-                            setAddingToCol(null);
                             setNewTaskTitle("");
+                            setAddingToCol(null);
                           } else if (e.key === 'Escape') {
                             setAddingToCol(null);
                             setNewTaskTitle("");
@@ -99,36 +99,33 @@ const Board = () => {
                       />
                     </div>
                   )}
-                  {/* ----------------------------- */}
 
                   {colTasks.map((task) => (
                     <KanbanCard key={task._id} task={task} onDragStart={handleDragStart} />
                   ))}
-                  {colTasks.length === 0 && (
-                    <div className="text-center text-sm text-gray-400 py-4 border-2 border-dashed border-gray-200 rounded-lg">
-                      Drop tasks here
+
+                  {colTasks.length === 0 && !addingToCol && (
+                    <div className="h-24 flex items-center justify-center border-2 border-dashed border-gray-200/50 rounded-xl">
+                       <span className="text-xs text-gray-400 font-medium">No tasks</span>
                     </div>
                   )}
                 </div>
               </div>
             );
           })}
-
         </div>
       </div>
     </div>
   );
 };
 
-// --- REUSABLE CARD COMPONENT ---
 const KanbanCard = ({ task, onDragStart }) => {
   const getPriorityColor = (priority) => {
     switch (priority?.toLowerCase()) {
-      case 'urgent': return 'bg-red-100 text-red-600';
-      case 'high': return 'bg-orange-100 text-orange-600';
-      case 'medium': return 'bg-blue-100 text-blue-600';
-      case 'low': return 'bg-gray-100 text-gray-600';
-      default: return 'bg-gray-100 text-gray-600';
+      case 'urgent': return 'bg-red-50 text-red-600 border-red-100';
+      case 'high': return 'bg-orange-50 text-orange-600 border-orange-100';
+      case 'medium': return 'bg-blue-50 text-blue-600 border-blue-100';
+      default: return 'bg-gray-50 text-gray-600 border-gray-100';
     }
   };
 
@@ -136,30 +133,35 @@ const KanbanCard = ({ task, onDragStart }) => {
     <div
       draggable
       onDragStart={(e) => onDragStart(e, task._id)}
-      className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow cursor-grab active:cursor-grabbing group"
+      className="bg-white p-4 rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.02)] border border-gray-100 hover:shadow-md hover:border-blue-100 transition-all cursor-grab active:cursor-grabbing group"
     >
-      <div className="flex justify-between items-start mb-3">
-        <h4 className="font-semibold text-gray-800 text-sm leading-snug">{task.title}</h4>
+      <div className="flex justify-between items-start mb-2">
+        <h4 className="font-bold text-gray-900 text-sm leading-tight group-hover:text-blue-600 transition-colors">{task.title}</h4>
         <button className="text-gray-300 hover:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">
-          <MoreHorizontal size={16} />
+          <MoreHorizontal size={14} />
         </button>
       </div>
 
-      <div className="mb-4 flex flex-col gap-2">
+      <div className="space-y-3">
         {task.project && (
-          <span className="text-xs text-gray-500 block truncate">{task.project.title}</span>
+           <div className="flex items-center gap-1">
+             <div className="w-1.5 h-1.5 rounded-full bg-blue-400"></div>
+             <span className="text-[10px] font-bold text-blue-500 uppercase tracking-tight truncate">
+               {task.project.title}
+             </span>
+           </div>
         )}
-        <span className={`w-max px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider ${getPriorityColor(task.priority)}`}>
-          {task.priority || 'Medium'}
-        </span>
-      </div>
 
-      <div className="flex justify-between items-center">
-        <div className="flex gap-1 flex-wrap">
+        <div className="flex items-center justify-between">
+          <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border ${getPriorityColor(task.priority)}`}>
+            {task.priority || 'Medium'}
+          </span>
+          
           {task.dueDate && (
-            <span className="px-2 py-1 bg-gray-50 flex items-center gap-1 text-gray-500 text-[10px] rounded border border-gray-100">
-              <Calendar size={10} /> {new Date(task.dueDate).toLocaleDateString()}
-            </span>
+            <div className="flex items-center gap-1 text-[10px] text-gray-400 font-medium">
+              <Calendar size={12} />
+              {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+            </div>
           )}
         </div>
       </div>
