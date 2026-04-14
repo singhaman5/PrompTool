@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'
+import axios from '../api/axios';
 import { useTask } from '../context/TaskContext';
 
 const LogIn = () => {
@@ -13,7 +13,7 @@ const LogIn = () => {
     event.preventDefault();
 
     // STEP 2a: Login request backend ko bheji jaati hai
-    axios.post('http://localhost:3001/api/auth/login',{email,password})
+    axios.post('  /api/auth/login',{email,password})
     .then(async (result) => {
       console.log("Server Says:",result.data);
       if(result.data.success) {

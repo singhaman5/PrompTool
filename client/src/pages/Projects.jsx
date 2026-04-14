@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Filter } from 'lucide-react';
 import ProjectCard from '../components/ProjectCard';
-import axios from 'axios';
+import axios from '../api/axios';
 
 const Projects = () => {
   const [projects, setProjects] = useState([]);
@@ -13,7 +13,7 @@ const Projects = () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
-      const res = await axios.get('http://localhost:3001/api/projects', {
+      const res = await axios.get('  /api/projects', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -35,7 +35,7 @@ const Projects = () => {
     if (!formData.title.trim()) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:3001/api/projects',
+      const res = await axios.post('  /api/projects',
         {
           title: formData.title,
           description: formData.description,

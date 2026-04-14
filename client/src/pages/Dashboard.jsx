@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import StatCard from '../components/StatCard';
 import { ListTodo, Timer, CheckCircle2, AlertCircle, Circle, ArrowRight } from 'lucide-react';
 import { useTask } from '../context/TaskContext';
-import axios from 'axios';
+import axios from '../api/axios';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 const Dashboard = () => {
@@ -16,7 +16,7 @@ const Dashboard = () => {
       try {
         const token = localStorage.getItem('token');
         if (token) {
-          const res = await axios.get('http://localhost:3001/api/projects', {
+          const res = await axios.get('  /api/projects', {
             headers: { Authorization: `Bearer ${token}` }
           });
           if (res.data.success) {

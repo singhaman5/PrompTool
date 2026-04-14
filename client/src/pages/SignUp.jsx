@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'
+import axios from '../api/axios';
 import { useTask } from '../context/TaskContext';
 
 const SignUp = () => {
@@ -12,7 +12,7 @@ const SignUp = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:3001/api/auth/signup',{name,email,password})
+    axios.post('  /api/auth/signup',{name,email,password})
     .then(async (result) => {
       console.log(result);
       if(result.data.success) {

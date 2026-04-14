@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Circle, X, Plus, Calendar, Tag } from 'lucide-react';
 import { useTask } from '../context/TaskContext';
-import axios from 'axios';
+import axios from '../api/axios';
 
 const Tasks = () => {
   const { tasks, addTask, removeTask, updateTask, fetchTasks } = useTask();
@@ -15,7 +15,7 @@ const Tasks = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) return;
-        const res = await axios.get('http://localhost:3001/api/projects', {
+        const res = await axios.get('  /api/projects', {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.success) {

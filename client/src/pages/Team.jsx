@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../api/axios';
 import { Plus, Search, Mail, Users, ArrowLeft, MoreVertical, Filter } from 'lucide-react';
 
 const Team = () => {
@@ -19,7 +19,7 @@ const Team = () => {
   const fetchTeams = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:3001/api/teams', {
+      const res = await axios.get('  /api/teams', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {
@@ -38,7 +38,7 @@ const Team = () => {
     
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:3001/api/teams', { 
+      const res = await axios.post('  /api/teams', { 
         name, 
         description: 'New Workspace Team' 
       }, {
@@ -58,7 +58,7 @@ const Team = () => {
     setInviteLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('http://localhost:3001/api/teams/invite', {
+      const res = await axios.post('  /api/teams/invite', {
         teamId: selectedTeam._id,
         name: inviteData.name,
         email: inviteData.email,
