@@ -100,7 +100,7 @@ PrompTool1/
 
 ### Clone the Repository
 ```bash
-git clone https://github.com/Aditya7005446231/PrompTool.git
+git clone https://github.com/singhaman5/PrompTool.git
 cd PrompTool1
 ```
 
@@ -249,8 +249,8 @@ This project is licensed under the ISC License.
 
 ## 👤 Author
 
-**Aditya Rai**
-- GitHub: [@Aditya7005446231](https://github.com/Aditya7005446231)
+**Aman Singh**
+- GitHub: [@singhaman5](https://github.com/singhaman5)
 
 ## 🙏 Acknowledgments
 
