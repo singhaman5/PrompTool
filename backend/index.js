@@ -46,6 +46,10 @@ app.use(cors({
     credentials: true
 }));
 
+app.get("/", (req, res) => {
+  res.send("Backend is running 🚀");
+});
+
 // ---- STEP 5: Mount Routes ----
 // app.use('/api/auth', authRoutes) means:
 //   All routes in authRoutes get prefixed with /api/auth
