@@ -38,7 +38,7 @@ const Team = () => {
     
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('  /api/teams', { 
+      const res = await axios.post('/teams', { 
         name, 
         description: 'New Workspace Team' 
       }, {
@@ -58,7 +58,7 @@ const Team = () => {
     setInviteLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('  /api/teams/invite', {
+      const res = await axios.post('/teams/invite', {
         teamId: selectedTeam._id,
         name: inviteData.name,
         email: inviteData.email,

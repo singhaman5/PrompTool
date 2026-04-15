@@ -13,7 +13,7 @@ const LogIn = () => {
     event.preventDefault();
 
     // STEP 2a: Login request backend ko bheji jaati hai
-    axios.post('  /api/auth/login',{email,password})
+    axios.post('/auth/login',{email,password})
     .then(async (result) => {
       console.log("Server Says:",result.data);
       if(result.data.success) {

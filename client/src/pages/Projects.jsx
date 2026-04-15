@@ -35,7 +35,7 @@ const Projects = () => {
     if (!formData.title.trim()) return;
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('  /api/projects',
+      const res = await axios.post('/projects',
         {
           title: formData.title,
           description: formData.description,
