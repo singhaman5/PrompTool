@@ -1,7 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import axios from '../api/axios';
 
-const API_URL = '  /api';
 const TaskContext = createContext();
 
 const getAuthHeader = () => {
@@ -22,7 +21,7 @@ export const TaskProvider = ({ children }) => {
     }
     try {
       setLoading(true);
-      const res = await axios.get(`${API_URL}/tasks`, { headers: getAuthHeader() });
+      const res = await axios.get('/tasks', { headers: getAuthHeader() });
       if (res.data.success) {
         setTasks(res.data.data);
       }
@@ -39,7 +38,7 @@ export const TaskProvider = ({ children }) => {
 
   const addTask = async (taskData) => {
     try {
-      const res = await axios.post(`${API_URL}/tasks`, taskData, { headers: getAuthHeader() });
+      const res = await axios.post('/tasks', taskData, { headers: getAuthHeader() });
       if (res.data.success) {
         setTasks(prev => [res.data.data, ...prev]);
       }
@@ -50,7 +49,7 @@ export const TaskProvider = ({ children }) => {
 
   const removeTask = async (id) => {
     try {
-      const res = await axios.delete(`${API_URL}/tasks/${id}`, { headers: getAuthHeader() });
+      const res = await axios.delete(`/tasks/${id}`, { headers: getAuthHeader() });
       if (res.data.success) {
         setTasks(prev => prev.filter(task => task._id !== id));
       }
@@ -61,7 +60,7 @@ export const TaskProvider = ({ children }) => {
 
   const updateTask = async (id, updatedFields) => {
     try {
-      const res = await axios.put(`${API_URL}/tasks/${id}`, updatedFields, { headers: getAuthHeader() });
+      const res = await axios.put(`/tasks/${id}`, updatedFields, { headers: getAuthHeader() });
       if (res.data.success) {
         setTasks(prev => prev.map(task => task._id === id ? res.data.data : task));
       }
