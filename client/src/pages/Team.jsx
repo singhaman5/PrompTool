@@ -19,7 +19,7 @@ const Team = () => {
   const fetchTeams = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('  /api/teams', {
+      const res = await axios.get('/teams', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.data.success) {

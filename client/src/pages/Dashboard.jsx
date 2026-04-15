@@ -16,7 +16,7 @@ const Dashboard = () => {
       try {
         const token = localStorage.getItem('token');
         if (token) {
-          const res = await axios.get('  /api/projects', {
+          const res = await axios.get('/projects', {
             headers: { Authorization: `Bearer ${token}` }
           });
           if (res.data.success) {

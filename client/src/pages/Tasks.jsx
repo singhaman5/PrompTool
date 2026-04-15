@@ -15,7 +15,7 @@ const Tasks = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) return;
-        const res = await axios.get('  /api/projects', {
+        const res = await axios.get('/projects', {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.success) {
