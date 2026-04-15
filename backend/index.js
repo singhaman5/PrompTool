@@ -42,7 +42,7 @@ app.use(express.json());
 // Your frontend (localhost:5173) and backend (localhost:3001) are DIFFERENT origins.
 // Without CORS, the browser would BLOCK the frontend from talking to the backend.
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'https://your-frontend-url.onrender.com'],
     credentials: true
 }));
 
