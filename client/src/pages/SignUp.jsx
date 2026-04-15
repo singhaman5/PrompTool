@@ -12,7 +12,7 @@ const SignUp = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    axios.post('  /api/auth/signup',{name,email,password})
+    axios.post('/auth/signup', { name, email, password })
     .then(async (result) => {
       console.log(result);
       if(result.data.success) {
